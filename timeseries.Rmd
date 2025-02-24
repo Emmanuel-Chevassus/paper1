@@ -1,0 +1,294 @@
+---
+title: "timeseries"
+author: "Emmanuel Chevassus"
+date: "2022-10-20"
+output: html_document
+---
+
+```{r }
+phyto <- read.csv("https://raw.githubusercontent.com/Emmanuel-Chevassus/paper1/main/timeseriesdaily.csv", header = TRUE, sep = ",", dec = ".")
+phyto$date<-as.POSIXct(phyto$date,format = "%d/%m/%Y")
+```
+
+```{r }
+laggged<-ccf(phyto$MSAOA, phyto$diatoms, lag.max = 10, plot = FALSE)
+# Extract the lag and acf values as vectors
+lag_values <- laggged$lag[, 1, 1]
+acf_values <- laggged$acf[, 1, 1]
+
+# Subset the data for lags less than or equal to 0
+lagged_MSAOA <- data.frame(lag = lag_values[lag_values <= 0], acf = acf_values[lag_values <= 0])
+
+
+####
+laggged<-ccf(phyto$MSAOA, phyto$coccolithophores, lag.max = 10, plot = FALSE)
+laggged
+plot(laggged, main = "Cross-Correlation between MSAOA and coccolitophores", xlab = "Lag (days)", ylab = "Correlation")
+####
+laggged<-ccf(phyto$MSAOA, phyto$chlorophytes, lag.max = 10, plot = FALSE)
+laggged
+plot(laggged, main = "Cross-Correlation between MSAOA and chlorophytes", xlab = "Lag (days)", ylab = "Correlation")
+####
+laggged<-ccf(phyto$MSAOA, phyto$cyanobacteria, lag.max = 10, plot = FALSE)
+laggged
+plot(laggged, main = "Cross-Correlation between MSAOA and cyanobacteria", xlab = "Lag (days)", ylab = "Correlation")
+
+####
+laggged<-ccf(phyto$MOA, phyto$diatoms, lag.max = 10, plot = FALSE)
+laggged
+plot(laggged, main = "Cross-Correlation between MOA and Diatoms", xlab = "Lag (days)", ylab = "Correlation")
+####
+laggged<-ccf(phyto$MOA, phyto$coccolithophores, lag.max = 10, plot = FALSE)
+laggged
+plot(laggged, main = "Cross-Correlation between MOA and coccolitophores", xlab = "Lag (days)", ylab = "Correlation")
+####
+laggged<-ccf(phyto$MOA, phyto$chlorophytes, lag.max = 10, plot = FALSE)
+laggged
+plot(laggged, main = "Cross-Correlation between MOA and chlorophytes", xlab = "Lag (days)", ylab = "Correlation")
+####
+laggged<-ccf(phyto$MOA, phyto$cyanobacteria, lag.max = 10, plot = FALSE)
+laggged
+plot(laggged, main = "Cross-Correlation between MOA and cyanobacteria", xlab = "Lag (days)", ylab = "Correlation")
+####
+
+```
+
+
+
+```{r }
+
+laggged_MSAOA<-ccf(phyto$MSAOA, phyto$diatoms, lag.max = 10, plot = FALSE)
+# Extract the lag and acf values as vectors
+lag_values <- laggged_MSAOA$lag[, 1, 1]
+acf_values <- laggged_MSAOA$acf[, 1, 1]
+
+# Subset the data for lags less than or equal to 0
+lagged_MSAOA <- data.frame(lag = lag_values[lag_values <= 0], acf = acf_values[lag_values <= 0])
+
+laggged<-ccf(phyto$MSAOA, phyto$diatoms, lag.max = 10, plot = FALSE)
+# Extract the lag and acf values as vectors
+lag_values_MSAOA <- laggged_MSAOA$lag[, 1, 1]
+acf_values_MSAOA <- laggged_MSAOA$acf[, 1, 1]
+
+
+
+laggged_MOA<-ccf(phyto$MOA, phyto$diatoms, lag.max = 10, plot = FALSE)
+# Extract the lag and acf values as vectors
+lag_values <- laggged_MOA$lag[, 1, 1]
+acf_values <- laggged_MOA$acf[, 1, 1]
+
+# Subset the data for lags less than or equal to 0
+lagged_MOA <- data.frame(lag = lag_values[lag_values <= 0], acf = acf_values[lag_values <= 0])
+
+laggged<-ccf(phyto$MOA, phyto$diatoms, lag.max = 10, plot = FALSE)
+# Extract the lag and acf values as vectors
+lag_values_MOA <- laggged_MOA$lag[, 1, 1]
+acf_values_MOA <- laggged_MOA$acf[, 1, 1]
+
+
+# Set up the plot with specified parameters
+plot(lagged_MSAOA$lag, lagged_MSAOA$acf,
+     main = "Daily Cross-Correlation between PMF factors and Diatoms",
+     xlab = "Lag (days)",
+     ylab = "Pearson's Correlation",
+     type = "b",
+     col = "red", # Change the color to red for MSAOA
+     pch = 16, # Change the point shape to a solid dot
+     cex = 1.2, # Increase the point size slightly
+     lwd = 2, # Increase the line width slightly
+     xlim = c(min(lagged_MSAOA$lag)-1, max(lagged_MSAOA$lag)+1), # Add a bit of padding to the x-axis
+     ylim = c(min(c(lagged_MSAOA$acf, lagged_MOA$acf))-0.1, max(c(lagged_MSAOA$acf, lagged_MOA$acf))+0.1), # Set the y-axis limits to the combined range with a bit of padding
+     las = 1, # Make the x-axis labels horizontal
+     cex.axis = 0.8, # Decrease the axis labels size
+     cex.lab = 1.2, # Increase the axis labels and title size
+     cex.main = 1.2) # Increase the title size
+
+# Add MOA data in blue
+lines(lagged_MOA$lag, lagged_MOA$acf, type = "b", col = "blue", pch = 17, lwd = 2, cex = 1.2)
+
+# Add a grid
+grid()
+
+# Add a horizontal line at y = 0 for reference
+abline(h = 0, lty = 2, col = "gray")
+
+# Add a legend
+legend("topright", c("MSA-OA", "PMOA"), col = c("red", "blue"), pch = c(16, 17), lty = 1, cex = 1.2)
+
+
+####################################
+
+laggged_MSAOA<-ccf(phyto$MSAOA, phyto$coccolithophores, lag.max = 10, plot = FALSE)
+# Extract the lag and acf values as vectors
+lag_values <- laggged_MSAOA$lag[, 1, 1]
+acf_values <- laggged_MSAOA$acf[, 1, 1]
+
+# Subset the data for lags less than or equal to 0
+lagged_MSAOA <- data.frame(lag = lag_values[lag_values <= 0], acf = acf_values[lag_values <= 0])
+
+laggged<-ccf(phyto$MSAOA, phyto$coccolithophores, lag.max = 10, plot = FALSE)
+# Extract the lag and acf values as vectors
+lag_values_MSAOA <- laggged_MSAOA$lag[, 1, 1]
+acf_values_MSAOA <- laggged_MSAOA$acf[, 1, 1]
+
+
+
+laggged_MOA<-ccf(phyto$MOA, phyto$coccolithophores, lag.max = 10, plot = FALSE)
+# Extract the lag and acf values as vectors
+lag_values <- laggged_MOA$lag[, 1, 1]
+acf_values <- laggged_MOA$acf[, 1, 1]
+
+# Subset the data for lags less than or equal to 0
+lagged_MOA <- data.frame(lag = lag_values[lag_values <= 0], acf = acf_values[lag_values <= 0])
+
+laggged<-ccf(phyto$MOA, phyto$coccolithophores, lag.max = 10, plot = FALSE)
+# Extract the lag and acf values as vectors
+lag_values_MOA <- laggged_MOA$lag[, 1, 1]
+acf_values_MOA <- laggged_MOA$acf[, 1, 1]
+
+
+# Set up the plot with specified parameters
+plot(lagged_MSAOA$lag, lagged_MSAOA$acf,
+     main = "Daily Cross-Correlation between PMF factors and coccolithophores",
+     xlab = "Lag (days)",
+     ylab = "Pearson's Correlation",
+     type = "b",
+     col = "red", # Change the color to red for MSAOA
+     pch = 16, # Change the point shape to a solid dot
+     cex = 1.2, # Increase the point size slightly
+     lwd = 2, # Increase the line width slightly
+     xlim = c(min(lagged_MSAOA$lag)-1, max(lagged_MSAOA$lag)+1), # Add a bit of padding to the x-axis
+     ylim = c(min(c(lagged_MSAOA$acf, lagged_MOA$acf))-0.1, max(c(lagged_MSAOA$acf, lagged_MOA$acf))+0.1), # Set the y-axis limits to the combined range with a bit of padding
+     las = 1, # Make the x-axis labels horizontal
+     cex.axis = 0.8, # Decrease the axis labels size
+     cex.lab = 1.2, # Increase the axis labels and title size
+     cex.main = 1.2) # Increase the title size
+
+# Add MOA data in blue
+lines(lagged_MOA$lag, lagged_MOA$acf, type = "b", col = "blue", pch = 17, lwd = 2, cex = 1.2)
+
+# Add a grid
+grid()
+
+# Add a horizontal line at y = 0 for reference
+abline(h = 0, lty = 2, col = "gray")
+
+# Add a legend
+
+laggged_MSAOA<-ccf(phyto$MSAOA, phyto$chlorophytes, lag.max = 10, plot = FALSE)
+# Extract the lag and acf values as vectors
+lag_values <- laggged_MSAOA$lag[, 1, 1]
+acf_values <- laggged_MSAOA$acf[, 1, 1]
+
+# Subset the data for lags less than or equal to 0
+lagged_MSAOA <- data.frame(lag = lag_values[lag_values <= 0], acf = acf_values[lag_values <= 0])
+
+laggged<-ccf(phyto$MSAOA, phyto$chlorophytes, lag.max = 10, plot = FALSE)
+# Extract the lag and acf values as vectors
+lag_values_MSAOA <- laggged_MSAOA$lag[, 1, 1]
+acf_values_MSAOA <- laggged_MSAOA$acf[, 1, 1]
+
+
+
+laggged_MOA<-ccf(phyto$MOA, phyto$chlorophytes, lag.max = 10, plot = FALSE)
+# Extract the lag and acf values as vectors
+lag_values <- laggged_MOA$lag[, 1, 1]
+acf_values <- laggged_MOA$acf[, 1, 1]
+
+# Subset the data for lags less than or equal to 0
+lagged_MOA <- data.frame(lag = lag_values[lag_values <= 0], acf = acf_values[lag_values <= 0])
+
+laggged<-ccf(phyto$MOA, phyto$chlorophytes, lag.max = 10, plot = FALSE)
+# Extract the lag and acf values as vectors
+lag_values_MOA <- laggged_MOA$lag[, 1, 1]
+acf_values_MOA <- laggged_MOA$acf[, 1, 1]
+
+
+# Set up the plot with specified parameters
+plot(lagged_MSAOA$lag, lagged_MSAOA$acf,
+     main = "Daily Cross-Correlation between PMF factors and chlorophytes",
+     xlab = "Lag (days)",
+     ylab = "Pearson's Correlation",
+     type = "b",
+     col = "red", # Change the color to red for MSAOA
+     pch = 16, # Change the point shape to a solid dot
+     cex = 1.2, # Increase the point size slightly
+     lwd = 2, # Increase the line width slightly
+     xlim = c(min(lagged_MSAOA$lag)-1, max(lagged_MSAOA$lag)+1), # Add a bit of padding to the x-axis
+     ylim = c(min(c(lagged_MSAOA$acf, lagged_MOA$acf))-0.1, max(c(lagged_MSAOA$acf, lagged_MOA$acf))+0.1), # Set the y-axis limits to the combined range with a bit of padding
+     las = 1, # Make the x-axis labels horizontal
+     cex.axis = 0.8, # Decrease the axis labels size
+     cex.lab = 1.2, # Increase the axis labels and title size
+     cex.main = 1.2) # Increase the title size
+
+# Add MOA data in blue
+lines(lagged_MOA$lag, lagged_MOA$acf, type = "b", col = "blue", pch = 17, lwd = 2, cex = 1.2)
+
+# Add a grid
+grid()
+
+# Add a horizontal line at y = 0 for reference
+abline(h = 0, lty = 2, col = "gray")
+
+
+
+laggged_MSAOA<-ccf(phyto$MSAOA, phyto$cyanobacteria, lag.max = 10, plot = FALSE)
+# Extract the lag and acf values as vectors
+lag_values <- laggged_MSAOA$lag[, 1, 1]
+acf_values <- laggged_MSAOA$acf[, 1, 1]
+
+# Subset the data for lags less than or equal to 0
+lagged_MSAOA <- data.frame(lag = lag_values[lag_values <= 0], acf = acf_values[lag_values <= 0])
+
+laggged<-ccf(phyto$MSAOA, phyto$cyanobacteria, lag.max = 10, plot = FALSE)
+# Extract the lag and acf values as vectors
+lag_values_MSAOA <- laggged_MSAOA$lag[, 1, 1]
+acf_values_MSAOA <- laggged_MSAOA$acf[, 1, 1]
+
+
+
+laggged_MOA<-ccf(phyto$MOA, phyto$cyanobacteria, lag.max = 10, plot = FALSE)
+# Extract the lag and acf values as vectors
+lag_values <- laggged_MOA$lag[, 1, 1]
+acf_values <- laggged_MOA$acf[, 1, 1]
+
+# Subset the data for lags less than or equal to 0
+lagged_MOA <- data.frame(lag = lag_values[lag_values <= 0], acf = acf_values[lag_values <= 0])
+
+laggged<-ccf(phyto$MOA, phyto$cyanobacteria, lag.max = 10, plot = FALSE)
+# Extract the lag and acf values as vectors
+lag_values_MOA <- laggged_MOA$lag[, 1, 1]
+acf_values_MOA <- laggged_MOA$acf[, 1, 1]
+
+
+# Set up the plot with specified parameters
+plot(lagged_MSAOA$lag, lagged_MSAOA$acf,
+     main = "Daily Cross-Correlation between PMF factors and cyanobacteria",
+     xlab = "Lag (days)",
+     ylab = "Pearson's Correlation",
+     type = "b",
+     col = "red", # Change the color to red for MSAOA
+     pch = 16, # Change the point shape to a solid dot
+     cex = 1.2, # Increase the point size slightly
+     lwd = 2, # Increase the line width slightly
+     xlim = c(min(lagged_MSAOA$lag)-1, max(lagged_MSAOA$lag)+1), # Add a bit of padding to the x-axis
+     ylim = c(min(c(lagged_MSAOA$acf, lagged_MOA$acf))-0.1, max(c(lagged_MSAOA$acf, lagged_MOA$acf))+0.1), # Set the y-axis limits to the combined range with a bit of padding
+     las = 1, # Make the x-axis labels horizontal
+     cex.axis = 0.8, # Decrease the axis labels size
+     cex.lab = 1.2, # Increase the axis labels and title size
+     cex.main = 1.2) # Increase the title size
+
+# Add MOA data in blue
+lines(lagged_MOA$lag, lagged_MOA$acf, type = "b", col = "blue", pch = 17, lwd = 2, cex = 1.2)
+
+# Add a grid
+grid()
+
+# Add a horizontal line at y = 0 for reference
+abline(h = 0, lty = 2, col = "gray")
+
+
+
+
+```
+
